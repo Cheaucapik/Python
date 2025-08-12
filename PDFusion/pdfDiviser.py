@@ -1,4 +1,5 @@
 import PyPDF2
+import commun as c
 
 def diviser() :
     pdf_reader, pdf_writer = debut()

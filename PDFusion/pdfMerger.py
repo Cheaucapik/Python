@@ -1,4 +1,5 @@
 import PyPDF2
+import commun as c
 
 def merger():
     merger = PyPDF2.PdfMerger()
