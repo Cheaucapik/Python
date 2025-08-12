@@ -1,13 +1,24 @@
-import pdfDiviser as d
-import pdfMerger as m
+import fonctions.pdfDiviser as d
+import fonctions.pdfMerger as m
+from fonctions.commandes import *
 
-print("Bienvenue sur PDFusion ! \n")
+def main() : 
+    print("*\n" * 80)
+    print("Bienvenue sur PDFusion ! \n".center(80))
+    print("*\n" * 80)
 
-while True : 
-    choix = input("Choisissez une option : \n 1. Merger \n 2. Diviser \n")
-    if choix == "1" : 
-        m.merger()
-    elif choix == "2" :
-        d.diviser()
-    else :
-        print("Veuillez choisir parmi les options.")
+    print("Tapez \"aide\" à tout moment pour afficher toutes les commandes disponibles \n")
+
+    while True : 
+        choix = input("Choisissez une option : \n 1. Merger \n 2. Diviser \n")
+        if choix == "1" : 
+            m.merger()
+        elif choix == "2" :
+            d.diviser()
+        elif choix in commandes :
+            commandes[choix]()
+        else :
+            print("Veuillez choisir parmi les options.")
+
+if __name__ == "__main__" :
+    main()

@@ -1,5 +1,5 @@
 import PyPDF2
-import commun as c
+from .commandes import *
 
 def diviser() :
     pdf_reader, pdf_writer = debut()
@@ -8,6 +8,8 @@ def diviser() :
 def debut() :
     while True :
         pdf = input("Entrer un document pdf : ")
+        if pdf in commandes :
+            commandes[pdf]()
         if pdf.lower().endswith('.pdf'):
             try:
                 pdf_file = open(pdf, 'rb')
@@ -25,6 +27,8 @@ def debut() :
 def choixPages(pdf_reader, pdf_writer) :
     while True : 
         choix = input("Combien de pages souhaitez vous extraire ? ")
+        if choix in commandes :
+            commandes[choix]()
         try:
             choix = int(choix)
             if(choix > 0):
