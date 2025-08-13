@@ -26,12 +26,8 @@ def choixDoc():
     return nb
 
 def merge(nb, merger):
-    buffer = io.BytesIO()
     for i in range(nb) : 
         while True : 
-            merger.write(buffer)
-            buffer.seek(0)
-            buffer_reader = PyPDF2.PdfReader(buffer)
             opt = 0
             chemin = input("Entrer le chemin du document " + str(i + 1) + ": ")
             if chemin in commandes :
@@ -41,7 +37,7 @@ def merge(nb, merger):
                 while True : 
                     choixM = input("Voulez vous rajouter une option pour merger ? \n y/n : ")
                     if choixM == "y" :
-                        opt = option(i, chemin, merger, buffer_reader)
+                        opt = option(i, chemin, merger)
                         break
                     elif choixM == "n" :
                         break
@@ -68,7 +64,7 @@ def nvPDF(merger) :
     merger.close()
     print("Votre pdf a été enregistré sous le nom de : " + nvTitre + ".pdf")
 
-def option(i, chemin, merger, buffer_reader) : 
+def option(i, chemin, merger) : 
     try : 
         pdf = open(chemin, 'rb')
         fichiers.append(pdf)
@@ -83,14 +79,14 @@ def option(i, chemin, merger, buffer_reader) :
             return 1
 
         if choixO == "2" :
-            opt = choix2(i, merger, buffer_reader, pdf)
+            opt = choix2(i, merger, pdf)
             if(opt == 0) :
                 continue
             else :
                 return 1
 
         elif choixO == "3" :
-            choix3(i, merger)
+            choix3(i, merger, pdf, pdf_reader)
 
         else : 
             print("Veuillez choisir parmi les options.")
@@ -118,30 +114,58 @@ def choix1(merger, pdf, pdf_reader) :
             print(f"Erreur : {e}")
 
 
-def choix2(i, merger, buffer_reader, pdf) :
-    print(len(buffer_reader.pages))
-    if i > 0 :
-        pos = input("Choisissez la page à partir de laquelle vous insérer votre pdf : ")
-        try :
-            pos = int(pos)
-            if(1 <= pos < len(buffer_reader.pages)) :
-                merger.merge(position = pos - 1, fileobj = pdf)
-                return 1
-            else :
-                print(f"Veuillez rentrer un nombre entre 1 et {len(buffer_reader.pages) - 1}")
-        except Exception as e :
+def choix2(i, merger, pdf) :
+    while True :
+        if i > 0 :
+            pos = input("Choisissez la page à partir de laquelle vous insérez votre pdf : ")
+            try :
+                pos = int(pos)
+                if(1 <= pos < len(merger.pages)) :
+                    merger.merge(position = pos - 1, fileobj = pdf)
+                    return 1
+                else :
+                    print(f"Veuillez rentrer un nombre entre 1 et {len(merger.pages) - 1}")
+            except Exception as e :
+                print(f"Erreur : {e}")
+        else : 
+            print("Veuillez choisir au moins un document au préalable.")
+            return 0
+
+def choix3(i, merger, pdf, pdf_reader) :
+    while True : 
+        pPage = input("Entrez l'index de la première page à avoir : ")
+        try:
+            pPage = int(pPage)
+            if(1 <= pPage < len(pdf_reader.pages)):
+                dPage = input("Entrez l'index de la dernière page à avoir : ")
+                try:
+                    dPage = int(dPage)
+                    if((1 <= dPage <= len(pdf_reader.pages)) and dPage != pPage):
+                         while True :
+                            if i > 0 :
+                                pos = input("Choisissez la page à partir de laquelle vous insérez votre pdf : ")
+                                try :
+                                    pos = int(pos)
+                                    if(1 <= pos < len(merger.pages)) :
+                                        merger.merge(position = pos - 1, fileobj = pdf, pages=(pPage, dPage))
+                                        return 1
+                                    else :
+                                        print(f"Veuillez rentrer un nombre entre 1 et {len(merger.pages) - 1}")
+                                except Exception as e :
+                                    print(f"Erreur : {e}")
+                            else : 
+                                print("Veuillez choisir au moins un document au préalable.")
+                                return 0
+                            print("Veuillez choisir au moins un document au préalable.")
+                            return
+                    else :
+                        print(f"Veuillez rentrer un nombre entre {pPage} et {len(pdf_reader.pages)}.")
+                except Exception as e :
+                    print(f"Erreur : {e}")
+            else:
+                print(f"Veuillez rentrer un nombre entre 1 et {len(pdf_reader.pages) - 1}.")
+        except Exception:
             print(f"Erreur : {e}")
-    else : 
-        print("Veuillez choisir au moins un document au préalable.")
-        return 0
-
-def choix3(i, merger) :
-    if i > 0 :
-        pass
-    else : 
-        print("Veuillez choisir au moins un document au préalable.")
-
-
 
 
 if __name__ == "__main__":
