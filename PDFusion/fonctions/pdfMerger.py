@@ -1,6 +1,7 @@
 import PyPDF2
 # from .commandes import *
-from commandes import commandes
+from commandes import commandes, fichiers
+import io
 
 def merger():
     merger = PyPDF2.PdfMerger()
@@ -25,8 +26,13 @@ def choixDoc():
     return nb
 
 def merge(nb, merger):
+    buffer = io.BytesIO()
     for i in range(nb) : 
         while True : 
+            merger.write(buffer)
+            buffer.seek(0)
+            buffer_reader = PyPDF2.PdfReader(buffer)
+            opt = 0
             chemin = input("Entrer le chemin du document " + str(i + 1) + ": ")
             if chemin in commandes :
                 commandes[chemin]()
@@ -35,7 +41,7 @@ def merge(nb, merger):
                 while True : 
                     choixM = input("Voulez vous rajouter une option pour merger ? \n y/n : ")
                     if choixM == "y" :
-                        opt = option(nb, chemin)
+                        opt = option(i, chemin, merger, buffer_reader)
                         break
                     elif choixM == "n" :
                         break
@@ -49,6 +55,8 @@ def merge(nb, merger):
                         print("Erreur : le pdf n'existe pas.")
                     except Exception as e :
                         print(f"Erreur inattendue : {e}")
+                else :
+                    break
             else :
                 print("Veuillez rentrer un pdf.")
 
@@ -60,50 +68,78 @@ def nvPDF(merger) :
     merger.close()
     print("Votre pdf a été enregistré sous le nom de : " + nvTitre + ".pdf")
 
-def option(nb, chemin) : 
+def option(i, chemin, merger, buffer_reader) : 
     try : 
         pdf = open(chemin, 'rb')
+        fichiers.append(pdf)
         pdf_reader = PyPDF2.PdfReader(pdf)
     except FileNotFoundError :
-        print("Erreur : le pdf n'existe pas.")
         return 0
-     
+    
     while True : 
         choixO = input("Souhaitez-vous : \n 1. Ajouter un certain nombre de pages \n 2. Insérer dans un autre document \n 3. Les deux\n")
         if choixO == "1" :
-
-            while True : 
-                pPage = input("Entrez l'index de la première page à avoir : ")
-                try:
-                    pPage = int(pPage)
-                    if(1 <= pPage < len(pdf_reader.pages)):
-                        dPage = input("Entrez l'index de la dernière page à avoir : ")
-                        try:
-                            dPage = int(dPage)
-                            if(1 <= dPage <= len(pdf_reader.pages and dPage != pPage)):
-                                merger.append(fileobj=pdf, pages=(pPage, dPage))
-                                return 1
-                            else :
-                                print(f"Veuillez rentrer un nombre entre {pPage} et {len(pdf_reader.pages)}.")
-                        except :
-                            print("Veuillez rentrer un nombre valide.")
-                    else:
-                        print(f"Veuillez rentrer un nombre entre 1 et {len(pdf_reader.pages) - 1}.")
-                except Exception:
-                    print("Veuillez rentrer un nombre valide.")
+            choix1(merger, pdf, pdf_reader)
+            return 1
 
         if choixO == "2" :
-            if nb > 0 :
-                pass
-            else : 
-                print("Veuillez choisir au moins un document au préalable.")
+            opt = choix2(i, merger, buffer_reader, pdf)
+            if(opt == 0) :
+                continue
+            else :
+                return 1
+
         elif choixO == "3" :
-            if nb > 0 :
-                pass
-            else : 
-                print("Veuillez choisir au moins un document au préalable.")
+            choix3(i, merger)
+
         else : 
             print("Veuillez choisir parmi les options.")
+
+
+def choix1(merger, pdf, pdf_reader) :
+    while True : 
+        pPage = input("Entrez l'index de la première page à avoir : ")
+        try:
+            pPage = int(pPage)
+            if(1 <= pPage < len(pdf_reader.pages)):
+                dPage = input("Entrez l'index de la dernière page à avoir : ")
+                try:
+                    dPage = int(dPage)
+                    if((1 <= dPage <= len(pdf_reader.pages)) and dPage != pPage):
+                        merger.append(fileobj=pdf, pages=(pPage - 1, dPage))
+                        return
+                    else :
+                        print(f"Veuillez rentrer un nombre entre {pPage} et {len(pdf_reader.pages)}.")
+                except Exception as e :
+                    print(f"Erreur : {e}")
+            else:
+                print(f"Veuillez rentrer un nombre entre 1 et {len(pdf_reader.pages) - 1}.")
+        except Exception:
+            print(f"Erreur : {e}")
+
+
+def choix2(i, merger, buffer_reader, pdf) :
+    print(len(buffer_reader.pages))
+    if i > 0 :
+        pos = input("Choisissez la page à partir de laquelle vous insérer votre pdf : ")
+        try :
+            pos = int(pos)
+            if(1 <= pos < len(buffer_reader.pages)) :
+                merger.merge(position = pos - 1, fileobj = pdf)
+                return 1
+            else :
+                print(f"Veuillez rentrer un nombre entre 1 et {len(buffer_reader.pages) - 1}")
+        except Exception as e :
+            print(f"Erreur : {e}")
+    else : 
+        print("Veuillez choisir au moins un document au préalable.")
+        return 0
+
+def choix3(i, merger) :
+    if i > 0 :
+        pass
+    else : 
+        print("Veuillez choisir au moins un document au préalable.")
 
 
 

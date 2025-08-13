@@ -35,8 +35,8 @@ def choixPages(pdf_reader, pdf_writer) :
                 break
             else:
                 print("Veuillez rentrer un nombre positif.")
-        except Exception:
-            print("Veuillez rentrer un nombre valide.")
+        except Exception as e:
+            print(f"Erreur : {e}")
 
     pages = []
     print('Dans l\'ordre insérer les pages')
@@ -51,8 +51,8 @@ def choixPages(pdf_reader, pdf_writer) :
                     break
                 else:
                     print(f"Veuillez rentrer un nombre entre 1 et {len(pdf_reader.pages)}.")
-            except Exception:
-                print("Veuillez rentrer un nombre valide.")
+            except Exception as e:
+                print(f"Erreur : {e}")
         print("Sélection : ", pages)
 
         page = pdf_reader.pages[numPage - 1]

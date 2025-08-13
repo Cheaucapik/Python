@@ -7,6 +7,8 @@ def aide():
     print("aide : lister les commandes d'aide\n")
 
 def q() :
+    for f in fichiers :
+        f.close()
     exit()
 
 def retour() :
@@ -17,6 +19,8 @@ def avance() :
 
 def annuler() :
     pass
+
+fichiers = []
 
 commandes = {
     "aide" : aide,
