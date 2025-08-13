@@ -1,6 +1,6 @@
 import PyPDF2
-#from .commandes import *
-from commandes import commandes, fichiers, lireCheminE, lireCheminS
+from .commandes import *
+# from commandes import commandes, fichiers, lireCheminE, lireCheminS
 import os
 
 def diviser() :
@@ -82,7 +82,7 @@ def nvPDF(pdf_writer) :
     try : 
         pdf_writer.write(fichier_sortie)
         pdf_writer.close()
-        print("Votre pdf a été enregistré sous le nom de : " + nvTitre + ".pdf")
+        print("Votre pdf a été enregistré sous le nom de : " + nvTitre + f".pdf dans le dossier {os.path.dirname(fichier_sortie)}")
         try :
             os.startfile(lireCheminS())
         except Exception:

@@ -3,9 +3,9 @@ import fonctions.pdfMerger as m
 from fonctions.commandes import *
 
 def main() : 
-    print("*\n" * 80)
+    print("*" * 80, "\n")
     print("Bienvenue sur PDFusion ! \n".center(80))
-    print("*\n" * 80)
+    print("*" * 80, "\n")
 
     print("Tapez \"aide\" à tout moment pour afficher toutes les commandes disponibles \n")
 

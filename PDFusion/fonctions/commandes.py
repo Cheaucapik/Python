@@ -1,9 +1,9 @@
 import os
+import sys
 
 def aide():
     print("\n", "*" * 20, "Commandes utiles à utiliser à n'importe quel moment", "*" * 20, "\n")
     print("exit : quitter l'application")
-    print("annuler : annuler l'action")
     print("defaut -e : sélectionne un dossier par défaut pour sélectionner des fichiers")
     print("defaut -s : sélectionne un dossier par défaut dans lequel enregistrer les fichiers")
     print("aide : lister les commandes d'aide\n")
@@ -13,8 +13,18 @@ def q() :
         f.close()
     exit()
 
-def annuler() :
-    pass
+def get_chemin_file():
+    """Retourne le chemin complet vers chemin.txt, à côté du script ou de l'exe."""
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    # On met chemin.txt à côté de l'exe, pas dans _MEIPASS (qui est en lecture seule)
+    exe_dir = os.path.dirname(os.path.abspath(sys.executable)) if getattr(sys, 'frozen', False) else base_path
+    chemin_file = os.path.join(exe_dir, "chemin.txt")
+    # Si le fichier n'existe pas → on le crée avec 2 lignes vides
+    if not os.path.exists(chemin_file):
+        with open(chemin_file, "w", encoding="utf-8") as f:
+            f.write("\n\n")
+    return chemin_file
+
 
 def defE() :
     while True :
@@ -22,6 +32,8 @@ def defE() :
         if os.path.exists(cheminDef) :
             ecrireCheminE(cheminDef)
             break
+        else :
+            print("Fichier inexistant.")
 
 def defS() :
     while True :
@@ -40,7 +52,7 @@ def defS() :
                 print("Veuillez choisir parmi les options.")
 
 def lireCheminE() :
-    with open("chemin.txt", "r") as f :
+    with open(get_chemin_file(), "r") as f :
         lignes = f.readlines()
 
         if not lignes :
@@ -50,7 +62,7 @@ def lireCheminE() :
         return str(premiere_ligne)
 
 def ecrireCheminE(nvChemin) :
-    with open("chemin.txt", "r") as f :
+    with open(get_chemin_file(), "r") as f :
         lignes = f.readlines()
         if not lignes:
             lignes = []
@@ -61,12 +73,12 @@ def ecrireCheminE(nvChemin) :
             lignes.append(f"{nvChemin}\n")
 
 
-    with open("chemin.txt", "w") as f :
+    with open(get_chemin_file(), "w") as f :
         f.writelines(lignes)
 
 
 def lireCheminS() :
-    with open("chemin.txt", "r") as f:
+    with open(get_chemin_file(), "r") as f:
         lignes = f.readlines()
 
         if len(lignes) < 2 :
@@ -77,7 +89,7 @@ def lireCheminS() :
         return str(deuxieme_ligne)
     
 def ecrireCheminS(nvChemin) :
-    with open("chemin.txt", "r") as f :
+    with open(get_chemin_file(), "r") as f :
         lignes = f.readlines()
 
         while len(lignes) < 2:
@@ -85,7 +97,7 @@ def ecrireCheminS(nvChemin) :
         
         lignes[1] = f"{nvChemin}"
 
-    with open("chemin.txt", "w") as f :
+    with open(get_chemin_file(), "w") as f :
         f.writelines(lignes)
 
 
@@ -98,7 +110,6 @@ fichiers = []
 commandes = {
     "aide" : aide,
     "exit" : q, 
-    "annuler" : annuler,
     "defaut -e" : defE,
     "defaut -s" : defS
 }

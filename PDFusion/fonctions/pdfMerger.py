@@ -1,6 +1,6 @@
 import PyPDF2
-# from .commandes import *
-from commandes import commandes, fichiers, lireCheminE, lireCheminS
+from .commandes import *
+# from commandes import commandes, fichiers, lireCheminE, lireCheminS
 import os
 
 def merger():
@@ -62,21 +62,21 @@ def option_merge(i, merger, pdf_reader, pdf) :
             continue
         if choixM == "y" :
             opt = option(i, merger, pdf_reader, pdf)
+            if opt == 0 : 
+                merger.append(pdf)
             break
         elif choixM == "n" :
+            merger.append(pdf)
             break
         else : 
             print("Veuillez choisir une des options.")  
-
-    if opt == 0 : 
-        merger.append(pdf)
 
 
 
 def option(i, merger, pdf_reader, pdf) : 
     
     while True : 
-        choixO = input("Souhaitez-vous : \n 1. Ajouter un certain nombre de pages \n 2. Insérer dans un autre document \n 3. Les deux\n")
+        choixO = input("Souhaitez-vous : \n 1. Ajouter un certain nombre de pages \n 2. Insérer dans un autre document \n 3. Les deux\n 4. retour \n")
         if choixO in commandes :
             commandes[choixO]()
             continue
@@ -94,7 +94,10 @@ def option(i, merger, pdf_reader, pdf) :
             pPage, dPage, pos = choixBoth(merger, pdf_reader)
             merger.merge(position = pos - 1, fileobj = pdf, pages=(pPage, dPage))
             return 1
-
+        
+        elif choixO == "4" :
+            return 0
+        
         elif choixO in ("2", "3") :
             print("Veuillez choisir au moins un document au préalable. \n")
             continue
@@ -138,10 +141,10 @@ def choixPos(merger) :
             continue
         try :
             pos = int(pos)
-            if(1 <= pos < len(merger.pages)) :
+            if(1 <= pos <= len(merger.pages)) :
                 return pos
             else :
-                print(f"Veuillez rentrer un nombre entre 1 et {len(merger.pages) - 1}")
+                print(f"Veuillez rentrer un nombre entre 1 et {len(merger.pages)}")
         except Exception as e :
             print(f"Erreur : {e}")
 
@@ -164,7 +167,7 @@ def nvPDF(merger) :
     try : 
         merger.write(fichier_sortie)
         merger.close()
-        print("Votre pdf a été enregistré sous le nom de : " + nvTitre + ".pdf")
+        print("Votre pdf a été enregistré sous le nom de : " + nvTitre + f".pdf dans le dossier {os.path.dirname(fichier_sortie)}")
         try :
             os.startfile(lireCheminS())
         except Exception:
