@@ -1,7 +1,7 @@
 import PyPDF2
 # from .commandes import *
-from commandes import commandes, fichiers
-import io
+from commandes import commandes, fichiers, lireCheminE, lireCheminS
+import os
 
 def merger():
     merger = PyPDF2.PdfMerger()
@@ -28,30 +28,38 @@ def choixDoc():
 def merge(nb, merger):
     for i in range(nb) : 
         while True : 
+            print("chemin actuel : ", lireCheminE())
             chemin = input("Entrer le chemin du document " + str(i + 1) + ": ")
             if chemin in commandes :
                 commandes[chemin]()
                 continue
             if chemin.lower().endswith(".pdf"):
-                verifPDF(chemin, i, merger)
-                break
+                pdfExist = verifPDF(chemin, i, merger)
+                if pdfExist == 0 :
+                    continue
+                else :
+                    break
             else :
                 print("Veuillez rentrer un pdf.")
 
 def verifPDF(chemin, i, merger) : 
     try : 
-        pdf = open(chemin, 'rb')
+        path = os.path.join(lireCheminE(), f"{chemin}")
+        pdf = open(path, 'rb')
         fichiers.append(pdf)
         pdf_reader = PyPDF2.PdfReader(pdf)
-        option_merge(i, chemin, merger, pdf_reader, pdf)
+        option_merge(i, merger, pdf_reader, pdf)
     except FileNotFoundError :
         print("Erreur : Le fichier n'existe pas, ou n'a pas été trouvé.")
         return 0
 
-def option_merge(i, chemin, merger, pdf_reader, pdf) :
+def option_merge(i, merger, pdf_reader, pdf) :
     opt = 0
     while True : 
         choixM = input("Voulez vous rajouter une option pour merger ? \n y/n : ")
+        if choixM in commandes :
+            commandes[choixM]()
+            continue
         if choixM == "y" :
             opt = option(i, merger, pdf_reader, pdf)
             break
@@ -61,7 +69,7 @@ def option_merge(i, chemin, merger, pdf_reader, pdf) :
             print("Veuillez choisir une des options.")  
 
     if opt == 0 : 
-        merger.append(chemin)
+        merger.append(pdf)
 
 
 
@@ -69,6 +77,9 @@ def option(i, merger, pdf_reader, pdf) :
     
     while True : 
         choixO = input("Souhaitez-vous : \n 1. Ajouter un certain nombre de pages \n 2. Insérer dans un autre document \n 3. Les deux\n")
+        if choixO in commandes :
+            commandes[choixO]()
+            continue
         if choixO == "1" :
             pPage, dPage =choixPages(pdf_reader)
             merger.append(fileobj = pdf, pages = (pPage, dPage))
@@ -95,10 +106,16 @@ def option(i, merger, pdf_reader, pdf) :
 def choixPages(pdf_reader) : 
     while True : 
         pPage = input("Entrez l'index de la première page à avoir : ")
+        if pPage in commandes :
+            commandes[pPage]()
+            continue
         try:
             pPage = int(pPage)
             if(1 <= pPage < len(pdf_reader.pages)):
                 dPage = input("Entrez l'index de la dernière page à avoir : ")
+                if dPage in commandes :
+                    commandes[dPage]()
+                    continue
                 try:
                     dPage = int(dPage)
                     if((1 <= dPage <= len(pdf_reader.pages)) and dPage != pPage):
@@ -116,6 +133,9 @@ def choixPages(pdf_reader) :
 def choixPos(merger) :
     while True :
         pos = input("Choisissez la page à partir de laquelle vous insérez votre pdf : ")
+        if pos in commandes :
+            commandes[pos]()
+            continue
         try :
             pos = int(pos)
             if(1 <= pos < len(merger.pages)) :
@@ -136,9 +156,21 @@ def nvPDF(merger) :
     nvTitre = input("Entre le nom du nouveau pdf : ")
     if nvTitre in commandes :
         commandes[nvTitre]()
-    merger.write(f"{nvTitre}.pdf")
-    merger.close()
-    print("Votre pdf a été enregistré sous le nom de : " + nvTitre + ".pdf")
+    fichier_sortie = os.path.join(lireCheminS(), f"{nvTitre}.pdf")
+    if os.path.exists(fichier_sortie) :
+        replace = input("Le fichier existe déjà voulez-vous le remplacer ? \n y/n : ")
+        if replace == "n" : 
+            merger.close()
+    try : 
+        merger.write(fichier_sortie)
+        merger.close()
+        print("Votre pdf a été enregistré sous le nom de : " + nvTitre + ".pdf")
+        try :
+            os.startfile(lireCheminS())
+        except Exception:
+            print("Impossible d'ouvrir le dossier.")
+    except :
+        print("Votre fichier n'a pas été enregistré.")
 
 if __name__ == "__main__":
     merger()
