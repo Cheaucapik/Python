@@ -79,3 +79,31 @@ print(rng.integers(1, 101, size=(3,2)))
 array = np.array([1, 2, 3, 4, 5])
 rng.shuffle(array)
 print(array)
+
+#float
+import numpy as np
+pi = np.pi
+print(f"{pi = :.2f}")
+
+#mask
+
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+mask = np.where(arr%2 == 0)
+print(arr[mask])
+
+#funky indexing
+arr = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+arr[[1, 4]] = [999, 999]
+print(arr)
+
+#reshape and clip
+arr = np.arange(1, 13).reshape(3, 4)  
+arr[1, 3] = 999
+print(arr)
+
+arr2 = np.arange(13, 25).reshape(3, 4)  
+print(arr2)
+arr2 = np.clip(arr2, 13, 20)
+print(arr2)
